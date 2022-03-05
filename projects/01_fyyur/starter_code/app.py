@@ -93,23 +93,31 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-    venue = Venue.query.get(venue_id)
-    listofshows=Show.query.filter_by(venue_id=venue_id).all()
     nextshowlist=[]
     prevshowlist=[]
+    venue = Venue.query.get(venue_id)
+    #listofshows=Show.query.filter_by(venue_id=venue_id).all()
+    listofshows = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time<datetime.now()).all()
     current_date = datetime.now()
     for show_listitem in listofshows:
-        artist = Artist.query.get(show_listitem.artist_id)
         showDictionaryItem ={
-            "artist_id": show_listitem.artist_id,
-            "artist_name": artist.name,
-            "artist_image_link": artist.image_link,
+            "artist_id": show_listitem.artist.id,
+            "artist_name": show_listitem.artist.name,
+            "artist_image_link": show_listitem.artist.image_link,
             "start_time": format_datetime(str(show_listitem.start_time))
         }
-        if(show_listitem.start_time>current_date):
-            nextshowlist.append(showDictionaryItem)
-        else:
-            prevshowlist.append(showDictionaryItem)
+        prevshowlist.append(showDictionaryItem)
+
+    listofshows = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time>datetime.now()).all()
+
+    for show_listitem in listofshows:
+        showDictionaryItem ={
+            "artist_id": show_listitem.artist.id,
+            "artist_name": show_listitem.artist.name,
+            "artist_image_link": show_listitem.artist.image_link,
+            "start_time": format_datetime(str(show_listitem.start_time))
+        }
+        nextshowlist.append(showDictionaryItem)
 
     venuedictionary={
         "id": venue.id,
@@ -218,22 +226,31 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
     artist = Artist.query.get(artist_id)
-    listofshows=Show.query.filter_by(artist_id=artist_id).all()
+    #listofshows=Show.query.filter_by(artist_id=artist_id).all()
     nextshowlist=[]
     prevshowlist=[]
     current_date = datetime.now()
+    listofshows = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time<datetime.now()).all()
+    print (listofshows)
+
     for show_listitem in listofshows:
-        venue = Venue.query.get(show_listitem.venue_id)
         showDictionaryItem ={
-            "venue_id": show_listitem.venue_id,
-            "venue_name": venue.name,
-            "venue_image_link": venue.image_link,
+            "venue_id": show_listitem.venue.id,
+            "venue_name": show_listitem.venue.name,
+            "venue_image_link": show_listitem.venue.image_link,
             "start_time": format_datetime(str(show_listitem.start_time))
         }
-        if(show_listitem.start_time>current_date):
-            nextshowlist.append(showDictionaryItem)
-        else:
-            prevshowlist.append(showDictionaryItem)
+        prevshowlist.append(showDictionaryItem)
+
+    listofshows = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>datetime.now()).all()
+    for show_listitem in listofshows:
+        showDictionaryItem ={
+            "venue_id": show_listitem.venue.id,
+            "venue_name": show_listitem.venue.name,
+            "venue_image_link": show_listitem.venue.image_link,
+            "start_time": format_datetime(str(show_listitem.start_time))
+        }
+        nextshowlist.append(showDictionaryItem)
     artistdictionary={
         "id": artist.id,
         "name": artist.name,
