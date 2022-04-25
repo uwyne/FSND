@@ -1,0 +1,14 @@
+{
+  "current_category": null, 
+  "questions": [
+    {
+      "answer": "H2O", 
+      "category": 1, 
+      "difficulty": 1, 
+      "id": 37, 
+      "question": "What is the formula of water"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 1
+}
