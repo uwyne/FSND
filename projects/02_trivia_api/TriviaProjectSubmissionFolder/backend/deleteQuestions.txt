@@ -1,4 +1,0 @@
-{
-  "deleted": 16, 
-  "success": true
-}
